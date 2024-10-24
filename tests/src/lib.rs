@@ -6,12 +6,12 @@
 
 use std::path::PathBuf;
 
-#[cfg(not(target_env = "msvc"))]
+#[cfg(all(not(target_env = "msvc"), not(target_os = "illumos")))]
 use jemallocator::Jemalloc;
 #[cfg(test)]
 use trc::Collector;
 
-#[cfg(not(target_env = "msvc"))]
+#[cfg(all(not(target_env = "msvc"), not(target_os = "illumos")))]
 #[global_allocator]
 static GLOBAL: Jemalloc = Jemalloc;
 

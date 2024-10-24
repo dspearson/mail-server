@@ -99,9 +99,10 @@ impl Listeners {
                     let value = value.to_string();
                     let key = ("server.listener", id, "socket", option);
                     let result = match option {
+                        #[cfg(not(target_os = "illumos"))]
                         "reuse-addr" => socket
                             .set_reuseaddr(config.try_parse_value(key, &value).unwrap_or(true)),
-                        #[cfg(not(target_env = "msvc"))]
+                        #[cfg(all(not(target_env = "msvc"), not(target_os = "illumos")))]
                         "reuse-port" => socket
                             .set_reuseport(config.try_parse_value(key, &value).unwrap_or(false)),
                         "send-buffer-size" => {
@@ -118,6 +119,7 @@ impl Listeners {
                                 continue;
                             }
                         }
+                        #[cfg(not(target_os = "illumos"))]
                         "tos" => {
                             if let Some(value) = config.try_parse_value(key, &value) {
                                 socket.set_tos(value)
@@ -134,9 +136,12 @@ impl Listeners {
                 }
             }
 
-            // Set default options
-            if !config.contains_key(("server.listener", id, "socket.reuse-addr")) {
-                let _ = socket.set_reuseaddr(true);
+            #[cfg(not(target_os = "illumos"))]
+            {
+                // Set default options
+                if !config.contains_key(("server.listener", id, "socket.reuse-addr")) {
+                    let _ = socket.set_reuseaddr(true);
+                }
             }
 
             listeners.push(TcpListener {

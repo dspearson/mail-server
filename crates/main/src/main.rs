@@ -16,10 +16,10 @@ use smtp::{core::SmtpSessionManager, StartQueueManager};
 use trc::Collector;
 use utils::wait_for_shutdown;
 
-#[cfg(not(target_env = "msvc"))]
+#[cfg(all(not(target_env = "msvc"), not(target_os = "illumos")))]
 use jemallocator::Jemalloc;
 
-#[cfg(not(target_env = "msvc"))]
+#[cfg(all(not(target_env = "msvc"), not(target_os = "illumos")))]
 #[global_allocator]
 static GLOBAL: Jemalloc = Jemalloc;
 
